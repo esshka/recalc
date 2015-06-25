@@ -23,7 +23,7 @@ pg.connect(conString, function(err, client, done) {
 
     var updateClampDuration = function(clampData){
       console.log(`updating clamp #${clampData.id} with duration ${clampData.duration}`);
-      client.query(`UPDATE clamps SET duration = ${clampData.duration} WHERE device_id = ${clampData.device_id}`, function(err, result){
+      client.query(`UPDATE clamps SET duration = ${clampData.duration} WHERE id = ${clampData.id}`, function(err, result){
         done();
         if(err) {
           return console.error('error running query', err);
