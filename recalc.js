@@ -22,14 +22,16 @@ pg.connect(conString, function(err, client, done) {
     }
 
     var updateClampDuration = function(clampData){
-      console.log(`updating clamp #${clampData.id} with duration ${clampData.duration}`);
-      client.query(`UPDATE clamps SET duration = ${clampData.duration} WHERE id = ${clampData.id}`, function(err, result){
-        done();
+      console.log(`row #${counter} | updating clamp #${clampData.id} with duration ${clampData.duration}`);
+      let updateQuery = client.query(`UPDATE clamps SET duration = ${clampData.duration} WHERE id = ${clampData.id}`, function(err, result){
         if(err) {
           return console.error('error running query', err);
         }
       });
-      counter++;
+      updateQuery.on('end', function(){
+         counter++;
+         console.log(`clamp #${clampData.id} updated in database!`);
+      });
     }
 
     WriteStream.prototype._write = function(chunk, encoding, callback) {
@@ -52,6 +54,10 @@ pg.connect(conString, function(err, client, done) {
     readStream.pipe(updateStream);
 
     readStream.on('end', function(){
-      console.log('finished', counter, 'clamps updated');
+      console.log('finished', counter, 'clamps updating...');
+    });
+
+    client.on('drain', function() {
+      console.log("update finished!");
     });
 });
